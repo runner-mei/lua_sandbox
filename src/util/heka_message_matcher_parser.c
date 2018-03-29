@@ -2372,10 +2372,11 @@ static size_t get_matcher_bytes(match_node_tmp nodes[], size_t size)
 
 static void make_tree(match_node_tmp nodes[], size_t size)
 {
-  // turn the postfix stack into a traversable tree
-  match_node_tmp *stack[size];
-  memset(stack, 0, sizeof(stack));
   int top = 0;
+  // turn the postfix stack into a traversable tree
+  match_node_tmp **stack = (match_node_tmp **)_alloca(size * sizeof(match_node_tmp*));
+  memset(stack, 0, size * sizeof(match_node_tmp*));
+
   for (unsigned i = 0; i < size; ++i) {
     if (nodes[i].op != OP_AND && nodes[i].op != OP_OR) {
       stack[top++] = &nodes[i];
@@ -2400,8 +2401,8 @@ static lsb_message_matcher* make_matcher(match_node_tmp nodes[], size_t size)
     return NULL;
   }
 
-  match_node *offsets[size];
-  memset(offsets, 0, sizeof(offsets));
+  match_node **offsets = (match_node **)_alloca(size * sizeof(match_node*));
+  memset(offsets, 0, size * sizeof(match_node*));
 
   inorder_traverse(size, offsets, mm->nodes, nodes, nodes + (size - 1));
 
